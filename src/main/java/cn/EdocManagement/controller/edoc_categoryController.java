@@ -60,7 +60,7 @@ public class edoc_categoryController {
     }
 
     public  void aa(){
-        System.out.print("你是猪吗？");
+        System.out.print("你是猪吗？     no 的");
     }
 }
 
