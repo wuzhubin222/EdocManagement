@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.EdocManagement.dao.edoc_entryMapper">
+
+    <select id="queryCount" resultType="Integer" parameterType="Integer">
+        select count(1) from edoc_entry where 1=1
+        <if test="categroyid !=null and categroyid !=0">
+            and categroyid=#{categroyid}
+        </if>
+    </select>
+
+    <select id="queryedoc_entry" resultMap="savedoc_entry">
+          SELECT e.*,c.id AS c_id,c.name AS c_name  FROM `edoc_entry` e ,`edoc_category` c WHERE e.categroyid=c.id
+          <if test="categroyid !=null">
+               and categroyid=#{categroyid}
+          </if>
+          order by e.id desc  LIMIT #{pageNo},#{pagesize}
+    </select>
+
+    <resultMap id="savedoc_entry" type="edoc_entry">
+        <id property="id" column="id" />
+        <result property="categroyid" column="categroyid" />
+        <result property="title" column="title" />
+        <result property="summary" column="summary" />
+        <result property="uploaduser" column="uploaduser" />
+        <result property="cretedate" column="cretedate" />
+        <association property="edoc_category" javaType="edoc_category">
+            <id property="id" column="c_id"/>
+            <result property="name" column="c_name"/>
+        </association>
+    </resultMap>
+
+    <delete id="deleteedoc_entry">
+       DELETE FROM edoc_entry where id=#{id}
+    </delete>
+</mapper>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+      http://www.springframework.org/schema/mvc
+      http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+      http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+    <!-- BEGIN=== 1、为业务层增加声明式事务管理的相关配置 ===BEGIN-->
+    <!-- 1.1、配置事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+
+    <!-- 2、读取据库配置文件，即database.properties -->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:database.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 3、配置数据源对象dataSource,使用JNDI获取数据库(dbcp连接池) -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!-- 4、创建SqlSessionFactoryBean对象 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 引入数据源对象 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 引入Mybatis的核心配置文件 -->
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <!-- 引入Mybatis的SQL映射文件 -->
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:cn/EdocManagement/dao/*.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 5、使用MapperScannerConfigurer去简化DAO层的配置
+   实现两个目的：1、它会自动去创建DAO接口的实现类。
+              2、自动为DAO接口实现类注入SqlSessionFactoryBean对象。 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.EdocManagement.dao"></property>
+    </bean>
+
+    <!-- 6、使用注解@Service简化Service层的配置
+   通过context:component-scan标签，Spring会自动去cn.smbms.service包里进行扫描，
+   一旦发现使用 @Service注解标注的类，让它注册Bean组件 -->
+    <context:component-scan base-package="cn.EdocManagement.service"/>
+
+
+</beans>
