@@ -58,4 +58,9 @@ public class edoc_categoryController {
             return "index";
         }
     }
+
+    public  void aa(){
+        System.out.print("你是猪吗？");
+    }
 }
+
